@@ -101,6 +101,7 @@ lazy_loader==0.4
 librosa==0.10.1
 llvmlite==0.43.0
 lmnt==1.1.4
+loguru==0.7.2
 markdown-it-py==3.0.0
 MarkupSafe==2.1.5
 marshmallow==3.22.0
