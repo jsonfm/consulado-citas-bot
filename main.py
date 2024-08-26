@@ -12,8 +12,10 @@ guayaquil_tz = pytz.timezone('America/Guayaquil')
 
 
 def check_and_notify(verbose: bool = True):
+    now = datetime.now(guayaquil_tz) 
+    now_str = now.strftime("%Y-%m-%d %H:%M:%S")
     if verbose:
-        logger.info(f'- consultando consulado [{datetime.now(guayaquil_tz).strftime("%Y-%m-%d %H:%M:%S")}]')
+        logger.info(f'- consultando consulado [{now_str}]')
 
     are_there_bookings = check_bookings_for_passport(take_screenshots=False, headless=True, browserless=True)
     if are_there_bookings:
@@ -22,7 +24,8 @@ def check_and_notify(verbose: bool = True):
 
 def run_schedule(only_night = True, start = 22, end = 6, delay: int = 60, every_minutes: int = 30, notify_on_first: bool = True, notify_on_last: bool = True):
     now = datetime.now(guayaquil_tz) 
-    logger.info(f"Bot iniciado [{now.strftime("%Y-%m-%d %H:%M:%S")}]")
+    now_str = now.strftime("%Y-%m-%d %H:%M:%S")
+    logger.info(f"Bot iniciado [{now_str}]")
     if notify_on_first:
         bot.send_message(Config.TELEGRAM_CHAT_ID, "Saludos, quería comunicarte que estoy operativo.")
     
