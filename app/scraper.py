@@ -1,5 +1,7 @@
-from playwright.sync_api import sync_playwright
 import time
+from app.config import Config
+from playwright.sync_api import sync_playwright
+
 
 
 def screenshot_page(page, folder: str = "./images", prefix: str = "screenshot"):
@@ -8,13 +10,17 @@ def screenshot_page(page, folder: str = "./images", prefix: str = "screenshot"):
 
 
 
-def check_bookings_for_passport(take_screenshots: bool = True, screenshot_folder: str = "./images", headless: bool = True):
+def check_bookings_for_passport(take_screenshots: bool = True, screenshot_folder: str = "./images", headless: bool = True, browserless: bool = True):
 
     url = "https://www.exteriores.gob.es/Consulados/guayaquil/es/ServiciosConsulares/Paginas/index.aspx?scco=Ecuador&scd=149&scca=Pasaportes+y+otros+documentos&scs=Pasaportes+-+Requisitos+y+procedimiento+para+obtenerlo"
     there_are_bookings = False
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=headless)
+        if browserless:
+            browser = p.chromium.connect(Config.BROWSER_PLAYWRIGHT_ENDPOINT)
+        else:
+            browser = p.chromium.launch(headless=headless)
+        
         browser_context = browser.new_context()
         page = browser_context.new_page()
 

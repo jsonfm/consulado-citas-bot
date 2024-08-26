@@ -14,7 +14,7 @@ def check_and_notify(verbose: bool = True):
     if verbose:
         print(f'- consultando consulado [{datetime.now(guayaquil_tz).strftime("%Y-%m-%d %H:%M:%S")}]')
 
-    are_there_bookings = check_bookings_for_passport(take_screenshots=False, headless=True)
+    are_there_bookings = check_bookings_for_passport(take_screenshots=False, headless=True, browserless=True)
     if are_there_bookings:
         bot.send_message(Config.TELEGRAM_CHAT_ID, "Hola, he detectado disponibilidad de citas. Probablemente sea un buen momento para consultar la página web del consulado.")
 
