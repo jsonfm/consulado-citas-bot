@@ -2,6 +2,7 @@ import schedule
 import time
 from app.scraper import check_bookings_for_passport
 from app.telegram import bot
+from app.logger import logger
 from app.config import Config
 from datetime import datetime
 import pytz
@@ -12,16 +13,18 @@ guayaquil_tz = pytz.timezone('America/Guayaquil')
 
 def check_and_notify(verbose: bool = True):
     if verbose:
-        print(f'- consultando consulado [{datetime.now(guayaquil_tz).strftime("%Y-%m-%d %H:%M:%S")}]')
+        logger.info(f'- consultando consulado [{datetime.now(guayaquil_tz).strftime("%Y-%m-%d %H:%M:%S")}]')
 
     are_there_bookings = check_bookings_for_passport(take_screenshots=False, headless=True, browserless=True)
     if are_there_bookings:
-        bot.send_message(Config.TELEGRAM_CHAT_ID, "Hola, he detectado disponibilidad de citas. Probablemente sea un buen momento para consultar la página web del consulado.")
+        bot.send_message(Config.TELEGRAM_CHAT_ID, "Hola, he detectado disponibilidad de citas. Probablemente sea un buen momento para revisar la página web del consulado.")
 
 
 def run_schedule(only_night = True, start = 22, end = 6, delay: int = 60, every_minutes: int = 30, notify_on_first: bool = True, notify_on_last: bool = True):
+    now = datetime.now(guayaquil_tz) 
+    logger.info(f"Bot iniciado [{now.strftime("%Y-%m-%d %H:%M:%S")}]")
     if notify_on_first:
-        bot.send_message(Config.TELEGRAM_CHAT_ID, "Hola, me encuentro operativo.")
+        bot.send_message(Config.TELEGRAM_CHAT_ID, "Saludos, quería comunicarte que estoy operativo.")
     
     first_check = True
     last_check = False
@@ -36,23 +39,20 @@ def run_schedule(only_night = True, start = 22, end = 6, delay: int = 60, every_
         if only_night and is_in_time:
             if first_check:
                 bot.send_message(Config.TELEGRAM_CHAT_ID, "Queria avisarte que he empezado mi jornada. 😎")
-                first_check = False
-            
-            schedule.run_pending()
+                first_check = False      
 
             if now.hour == end - 1 and now.minute >= every_minutes:  # Check if it's the last check of the night
                 last_check = True
             
-        elif not only_night: 
-            schedule.run_pending()
-        
         if last_check:
             bot.send_message(Config.TELEGRAM_CHAT_ID, "Ha sido una larga noche. Voy a dormir. 🥱😴")
             last_check = False
             first_check = True  # Reset for the next night
 
+        schedule.run_pending()
         time.sleep(delay)
 
 
 if __name__ == "__main__":
     run_schedule()
+    # check_bookings_for_passport(headless=False, browserless=False)
